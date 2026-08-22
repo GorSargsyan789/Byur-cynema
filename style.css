@@ -19,7 +19,6 @@ body {
     margin: 0 auto;
 }
 
-
 header {
     display: flex;
     justify-content: space-between;
@@ -68,10 +67,11 @@ header {
     padding: 8px 14px;
     border-radius: 10px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-weight: 600;
+    text-decoration: none;
     transition: 0.2s;
 }
 
@@ -93,7 +93,6 @@ header {
 }
 .social-links a:hover { color: #fff; background: rgba(255, 255, 255, 0.15); }
 
-
 h2 { margin-bottom: 20px; font-size: 20px; color: #cbd5e1; }
 
 .movies-grid {
@@ -107,9 +106,9 @@ h2 { margin-bottom: 20px; font-size: 20px; color: #cbd5e1; }
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     overflow: hidden;
-    cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .movie-card:hover {
@@ -119,12 +118,15 @@ h2 { margin-bottom: 20px; font-size: 20px; color: #cbd5e1; }
 
 .movie-card img {
     width: 100%;
-    height: 260px;
+    height: 250px;
     object-fit: cover;
 }
 
-.movie-info {
-    padding: 12px;
+.movie-info { 
+    padding: 12px; 
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .movie-title {
@@ -139,51 +141,112 @@ h2 { margin-bottom: 20px; font-size: 20px; color: #cbd5e1; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin: 8px 0 12px 0;
     font-size: 12px;
     color: #94a3b8;
 }
 
-.rating {
-    color: #f59e0b;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
+.rating { color: #f59e0b; font-weight: 700; }
 
-
-.modal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
+.watch-btn {
+    margin-top: auto;
+    background: #e11d48;
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    gap: 6px;
+    transition: 0.2s;
 }
 
-.modal.hidden { display: none; }
+.watch-btn:hover { background: #be123c; }
 
-.modal-content {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    max-width: 600px;
-    width: 90%;
+/* MOVIE DETAILS PAGE STYLES */
+.movie-details-header {
+    display: flex;
+    gap: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 25px;
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
 }
 
-.close-btn {
-    position: absolute;
-    top: 15px; right: 20px;
-    font-size: 28px;
-    color: #94a3b8;
-    cursor: pointer;
+.details-poster {
+    width: 200px;
+    height: 300px;
+    border-radius: 12px;
+    object-fit: cover;
 }
-.close-btn:hover { color: #fff; }
+
+.details-info { flex: 1; min-width: 280px; }
+.details-info h1 { font-size: 28px; margin-bottom: 10px; }
+.movie-rating { color: #f59e0b; font-weight: 600; margin-bottom: 15px; }
+.movie-overview { color: #cbd5e1; line-height: 1.6; font-size: 14px; margin-bottom: 20px; }
+
+.player-section { margin-top: 20px; }
+.responsive-player {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.responsive-player iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+}
+.categories-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.categories-bar::-webkit-scrollbar {
+    height: 4px;
+}
+.categories-bar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.cat-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s ease;
+}
+
+.cat-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.cat-btn.active {
+    background: #e11d48;
+    color: #fff;
+    border-color: #e11d48;
+}

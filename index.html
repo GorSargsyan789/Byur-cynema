@@ -12,7 +12,7 @@
         <header>
             <div class="logo">
                 <i class="fa-solid fa-film"></i>
-                <span>CinePulse</span>
+                <a href="index.html" style="color: inherit; text-decoration: none;"><span>CinePulse</span></a>
             </div>
             
             <form id="search-form" class="search-box">
@@ -32,19 +32,21 @@
             </div>
         </header>
 
+        <!-- CATEGORIES FILTER BAR -->
+        <nav class="categories-bar">
+            <button class="cat-btn active" data-type="trending"><i class="fa-solid fa-fire"></i> Trending</button>
+            <button class="cat-btn" data-type="popular"><i class="fa-solid fa-star"></i> Popular</button>
+            <button class="cat-btn" data-type="top_rated"><i class="fa-solid fa-trophy"></i> Top Rated</button>
+            <button class="cat-btn" data-type="upcoming"><i class="fa-solid fa-calendar-days"></i> Upcoming</button>
+            <button class="cat-btn" data-type="tv"><i class="fa-solid fa-tv"></i> TV Series</button>
+            <button class="cat-btn" data-genre="28"><i class="fa-solid fa-gun"></i> Action</button>
+            <button class="cat-btn" data-genre="35"><i class="fa-solid fa-masks-theater"></i> Comedy</button>
+        </nav>
+
         <main>
             <h2 id="section-title">Trending Movies</h2>
-            <div id="movies-grid" class="movies-grid">
-            </div>
+            <div id="movies-grid" class="movies-grid"></div>
         </main>
-    </div>
-
-    <div id="movie-modal" class="modal hidden">
-        <div class="modal-content">
-            <span id="close-modal" class="close-btn">&times;</span>
-            <div id="modal-body">
-            </div>
-        </div>
     </div>
 
     <script src="app.js"></script>
