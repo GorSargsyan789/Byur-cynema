@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=byur_user
+      - DB_PASSWORD=byur_password
+      - DB_NAME=byur_cynema_db
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: byur_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: byur_user
+      POSTGRES_PASSWORD: byur_password
+      POSTGRES_DB: byur_cynema_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

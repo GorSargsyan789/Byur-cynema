@@ -2,6 +2,7 @@ const API_KEY = "964104e360ac2eac46f7a30bf25a59d1";
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMG_URL = "https://image.tmdb.org/t/p/w500";
 
+const AUTH_API_URL = "http://localhost:5000/api";
 const moviesGrid = document.getElementById("movies-grid");
 const searchForm = document.getElementById("search-form");
 const searchInput = document.getElementById("search-input");

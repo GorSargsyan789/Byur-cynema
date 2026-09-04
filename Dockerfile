@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-WORKDIR /us/share/nginx/html
+WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 COPY . .
 EXPOSE 80
