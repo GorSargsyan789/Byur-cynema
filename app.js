@@ -10,7 +10,6 @@ const favoritesBtn = document.getElementById("favorites-btn");
 const sectionTitle = document.getElementById("section-title");
 const categoryButtons = document.querySelectorAll(".cat-btn");
 
-let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 let isLoginMode = true;
 
 // ------------------- AUTH & MODAL FUNCTIONALITY -------------------
@@ -71,9 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (response.ok) {
                     alert(data.message);
-                    if (isLoginMode && data.token) {
-                        localStorage.setItem("byur_token", data.token);
+                    if (isLoginMode && data.user) {
+                        localStorage.setItem("user_id", data.user.id);
                         localStorage.setItem("byur_username", username);
+                        if (data.token) localStorage.setItem("byur_token", data.token);
+                        
                         if (authModal) authModal.style.display = "none";
                         updateAuthUI();
                     } else if (!isLoginMode) {
@@ -111,6 +112,7 @@ function updateAuthUI() {
 }
 
 function logout() {
+    localStorage.removeItem("user_id");
     localStorage.removeItem("byur_token");
     localStorage.removeItem("byur_username");
     location.reload();
@@ -130,11 +132,11 @@ async function fetchMovies(url, title) {
     }
 }
 
-function displayMovies(movies) {
+function displayMovies(movies, isWatchlistSection = false) {
     if (!moviesGrid) return;
     moviesGrid.innerHTML = "";
     if (!movies || movies.length === 0) {
-        moviesGrid.innerHTML = "<p style='color: #94a3b8;'>No results found.</p>";
+        moviesGrid.innerHTML = "<p style='color: #94a3b8;'>Ցուցակը դատարկ է:</p>";
         return;
     }
 
@@ -142,26 +144,103 @@ function displayMovies(movies) {
         const title = item.title || item.name;
         const releaseDate = item.release_date || item.first_air_date;
         const year = releaseDate ? releaseDate.split("-")[0] : "N/A";
-        const poster = item.poster_path ? IMG_URL + item.poster_path : "https://via.placeholder.com/500x750?text=No+Image";
-        const isTv = !item.title;
+        
+        // poster URL-ի ստուգում
+        const poster = item.poster_path 
+            ? (item.poster_path.startsWith("http") ? item.poster_path : IMG_URL + item.poster_path)
+            : "https://via.placeholder.com/500x750?text=No+Image";
+
+        const movieId = item.movie_id || item.id;
 
         const card = document.createElement("div");
         card.className = "movie-card";
+
+        const actionButton = isWatchlistSection ? `
+            <button class="add-to-watchlist-btn" onclick="removeFromWatchlist('${movieId}')" style="background-color: #e50914;">
+                <i class="fa-solid fa-trash"></i> Հեռացնել
+            </button>
+        ` : `
+            <button class="add-to-watchlist-btn" onclick="addToWatchlist('${movieId}', '${title.replace(/'/g, "\\'")}', '${poster}')">
+                <i class="fa-solid fa-plus"></i> Watchlist
+            </button>
+        `;
+
         card.innerHTML = `
             <img src="${poster}" alt="${title}">
             <div class="movie-info">
-                <div class="movie-title">${title}</div>
-                <div class="movie-meta">
-                    <span>${year}</span>
-                    <span class="rating"><i class="fa-solid fa-star"></i> ${(item.vote_average || 0).toFixed(1)}</span>
-                </div>
-                <a href="movie.html?id=${item.id}&type=${isTv ? 'tv' : 'movie'}" class="watch-btn">
-                    <i class="fa-solid fa-play"></i> Watch ${isTv ? 'Series' : 'Movie'}
-                </a>
+                <h3>${title} ${year !== "N/A" ? `(${year})` : ""}</h3>
+                ${actionButton}
             </div>
         `;
         moviesGrid.appendChild(card);
     });
+}
+
+// ------------------- WATCHLIST BACKEND INTEGRATION -------------------
+async function addToWatchlist(movieId, title, posterPath) {
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        alert("Ֆիլմ ավելացնելու համար նախ մուտք գործեք համակարգ:");
+        return;
+    }
+
+    try {
+        const res = await fetch(`${AUTH_API_URL}/watchlist/add`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: userId,
+                movie_id: movieId,
+                title: title,
+                poster_path: posterPath
+            })
+        });
+
+        const data = await res.json();
+        alert(data.message);
+    } catch (error) {
+        console.error("Սխալ ավելացնելիս:", error);
+        alert("Սերվերի սխալ:");
+    }
+}
+
+async function loadUserWatchlist() {
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        alert("Խնդրում ենք նախ մուտք գործել համակարգ:");
+        return;
+    }
+
+    try {
+        const res = await fetch(`${AUTH_API_URL}/watchlist/${userId}`);
+        const movies = await res.json();
+        displayMovies(movies, true);
+    } catch (error) {
+        console.error("Սխալ բեռնելիս:", error);
+    }
+}
+
+async function removeFromWatchlist(movieId) {
+    const userId = localStorage.getItem("user_id");
+
+    try {
+        const res = await fetch(`${AUTH_API_URL}/watchlist/remove`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: userId,
+                movie_id: movieId
+            })
+        });
+
+        const data = await res.json();
+        alert(data.message);
+        loadUserWatchlist(); // Թարմացնում ենք ցուցակը
+    } catch (error) {
+        console.error("Սխալ ջնջելիս:", error);
+    }
 }
 
 // Category Tabs Click Handling
@@ -207,6 +286,6 @@ if (favoritesBtn) {
     favoritesBtn.addEventListener("click", () => {
         categoryButtons.forEach(b => b.classList.remove("active"));
         if (sectionTitle) sectionTitle.innerText = "My Watchlist";
-        displayMovies(watchlist);
+        loadUserWatchlist();
     });
 }

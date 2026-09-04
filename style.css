@@ -1,302 +1,354 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
-
+/* ==========================================
+   1. GENERAL STYLES & RESET
+   ========================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #0f172a;
-    color: #f8fafc;
+    background-color: #141414;
+    color: #ffffff;
     min-height: 100vh;
-    padding: 20px;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 20px;
 }
 
+/* ==========================================
+   2. HEADER & NAVIGATION
+   ========================================== */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    gap: 15px;
-    flex-wrap: wrap;
+    padding: 15px 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #222;
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 22px;
-    font-weight: 700;
-    color: #e11d48;
+    font-size: 24px;
+    font-weight: bold;
+    color: #e50914;
 }
 
+.logo i {
+    font-size: 28px;
+}
+
+/* Search Box */
 .search-box {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 8px 15px;
-    width: 320px;
+    background-color: #000000;
+    border: 1px solid #333;
+    padding: 8px 16px;
+    border-radius: 20px;
+    width: 300px;
+    transition: border-color 0.3s;
 }
 
-.search-box i { color: #94a3b8; margin-right: 10px; }
+.search-box:focus-within {
+    border-color: #e50914;
+}
+
+.search-box i {
+    color: #777;
+    margin-right: 10px;
+}
+
 .search-box input {
     background: transparent;
     border: none;
-    outline: none;
     color: #fff;
+    outline: none;
     width: 100%;
+    font-size: 14px;
 }
 
-.header-right { display: flex; align-items: center; gap: 15px; }
-
-.nav-btn {
-    background: rgba(225, 29, 72, 0.15);
-    border: 1px solid rgba(225, 29, 72, 0.3);
-    color: #fb7185;
-    padding: 8px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.2s;
-}
-
-.nav-btn:hover { background: #e11d48; color: #fff; }
-
-.social-links { display: flex; gap: 10px; }
-.social-links a {
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #94a3b8;
+/* Header Right */
+.header-right {
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: 0.2s;
-}
-.social-links a:hover { color: #fff; background: rgba(255, 255, 255, 0.15); }
-
-h2 { margin-bottom: 20px; font-size: 20px; color: #cbd5e1; }
-
-.movies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
 }
 
-.movie-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Watchlist Button */
+.watchlist-nav-btn {
     display: flex;
-    flex-direction: column;
-}
-
-.movie-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-}
-
-.movie-card img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-}
-
-.movie-info { 
-    padding: 12px; 
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.movie-title {
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #e50914, #b20710);
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 20px;
     font-size: 14px;
     font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
 }
 
-.movie-meta {
+.watchlist-nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(229, 9, 20, 0.5);
+    background: linear-gradient(135deg, #f40612, #c40812);
+}
+
+/* Social Links */
+.social-links {
     display: flex;
-    justify-content: space-between;
+    gap: 15px;
+}
+
+.social-links a {
+    color: #aaa;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-links a:hover {
+    color: #ffffff;
+}
+
+/* Auth Buttons container */
+#auth-buttons {
+    display: flex;
     align-items: center;
-    margin: 8px 0 12px 0;
-    font-size: 12px;
-    color: #94a3b8;
 }
 
-.rating { color: #f59e0b; font-weight: 700; }
-
-.watch-btn {
-    margin-top: auto;
-    background: #e11d48;
-    color: #fff;
-    text-align: center;
-    padding: 8px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: 0.2s;
-}
-
-.watch-btn:hover { background: #be123c; }
-
-/* MOVIE DETAILS PAGE STYLES */
-.movie-details-header {
-    display: flex;
-    gap: 30px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 25px;
-    border-radius: 16px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.details-poster {
-    width: 200px;
-    height: 300px;
-    border-radius: 12px;
-    object-fit: cover;
-}
-
-.details-info { flex: 1; min-width: 280px; }
-.details-info h1 { font-size: 28px; margin-bottom: 10px; }
-.movie-rating { color: #f59e0b; font-weight: 600; margin-bottom: 15px; }
-.movie-overview { color: #cbd5e1; line-height: 1.6; font-size: 14px; margin-bottom: 20px; }
-
-.player-section { margin-top: 20px; }
-.responsive-player {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-    border-radius: 16px;
-    background: #000;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.responsive-player iframe {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border: 0;
-}
+/* ==========================================
+   3. CATEGORIES FILTER BAR
+   ========================================== */
 .categories-bar {
     display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 12px;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .categories-bar::-webkit-scrollbar {
     height: 4px;
 }
+
 .categories-bar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background-color: #333;
     border-radius: 4px;
 }
 
 .cat-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
-    padding: 8px 16px;
+    background-color: #222;
+    color: #ccc;
+    border: none;
+    padding: 10px 18px;
     border-radius: 20px;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
     white-space: nowrap;
-    font-size: 13px;
-    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: 0.2s ease;
-}
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 99999;
-    justify-content: center;
-    align-items: center;
-}
-.modal-card {
-    background: #181818;
-    color: white;
-    padding: 30px;
-    border-radius: 10px;
-    width: 320px;
-    position: relative;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-    font-family: sans-serif;
-}
-.modal-card input {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    box-sizing: border-box;
-    background: #2a2a2a;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 5px;
-    outline: none;
-}
-.modal-card button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 12px;
-    background: #e50914;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 15px;
-}
-.close-btn {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    cursor: pointer;
-    font-size: 24px;
-    color: #888;
-}
-.close-btn:hover { color: white; }
-.cat-btn:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.15);
+    gap: 8px;
+    transition: all 0.3s ease;
 }
 
-.cat-btn.active {
-    background: #e11d48;
+.cat-btn:hover, .cat-btn.active {
+    background-color: #e50914;
+    color: #ffffff;
+}
+
+/* ==========================================
+   4. MOVIES GRID & CARDS
+   ========================================== */
+#section-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+    border-left: 4px solid #e50914;
+    padding-left: 10px;
+}
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.movie-card {
+    background-color: #1f1f1f;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.movie-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+}
+
+.movie-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.movie-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.movie-info h3 {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
     color: #fff;
-    border-color: #e11d48;
+    margin: 0;
+}
+
+/* Add / Remove Watchlist button inside cards */
+.add-to-watchlist-btn {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.add-to-watchlist-btn:hover {
+    background-color: #e50914;
+    border-color: #e50914;
+}
+
+/* ==========================================
+   5. MODAL POPUP (LOGIN & REGISTER)
+   ========================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-card {
+    background-color: #181818;
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+    border: 1px solid #2a2a2a;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+#auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+#auth-form input {
+    padding: 12px 15px;
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+#auth-form input:focus {
+    border-color: #e50914;
+}
+
+#modal-submit-btn {
+    padding: 12px;
+    background-color: #e50914;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#modal-submit-btn:hover {
+    background-color: #f40612;
+}
+
+/* ==========================================
+   6. RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+
+    .movie-card img {
+        height: 220px;
+    }
 }
