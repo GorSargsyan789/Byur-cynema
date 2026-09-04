@@ -1,106 +1,225 @@
+// ==========================================
+// 1. CONFIGURATION & CONSTANTS
+// ==========================================
 const API_KEY = "964104e360ac2eac46f7a30bf25a59d1";
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMG_URL = "https://image.tmdb.org/t/p/w500";
 
-const AUTH_API_URL = "http://localhost:5000/api";
-const moviesGrid = document.getElementById("movies-grid");
-const searchForm = document.getElementById("search-form");
-const searchInput = document.getElementById("search-input");
-const favoritesBtn = document.getElementById("favorites-btn");
-const sectionTitle = document.getElementById("section-title");
-const categoryButtons = document.querySelectorAll(".cat-btn");
-
+// Global Watchlist Array
 let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
 
-// Ֆիլմերի / Սերիալների բեռնում
-async function fetchMovies(url, title) {
-    sectionTitle.innerText = title;
-    moviesGrid.innerHTML = "<p style='color: #94a3b8;'>Loading...</p>";
-    
+// ==========================================
+// 2. DOM ELEMENTS
+// ==========================================
+const moviesGrid = document.getElementById("movies-grid");
+const sectionTitle = document.getElementById("section-title");
+const searchInput = document.getElementById("search-input");
+const categoryButtons = document.querySelectorAll(".cat-btn");
+const watchlistNavBtn = document.getElementById("watchlist-btn");
+
+// Modal Elements
+const authModal = document.getElementById("auth-modal");
+const modalTitle = document.getElementById("modal-title");
+const loginBtn = document.getElementById("login-btn");
+const registerBtn = document.getElementById("register-btn");
+const closeModalBtn = document.querySelector(".close-btn");
+
+// ==========================================
+// 3. FETCH MOVIES FROM TMDB API
+// ==========================================
+async function fetchMovies(endpoint, title = "Trending Movies") {
+    if (sectionTitle) sectionTitle.innerText = title;
+    moviesGrid.innerHTML = `<div style="color: #aaa; padding: 20px;">Բեռնվում է...</div>`;
+
     try {
-        const res = await fetch(url);
-        const data = await res.json();
-        displayMovies(data.results);
+        const response = await fetch(`${BASE_URL}${endpoint}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.results && data.results.length > 0) {
+            displayMovies(data.results);
+        } else {
+            moviesGrid.innerHTML = `<p style="color: #aaa; padding: 20px;">Ֆիլմեր չեն գտնվել:</p>`;
+        }
     } catch (error) {
-        moviesGrid.innerHTML = "<p style='color: #e11d48;'>Error loading data.</p>";
+        console.error("Fetch Error:", error);
+        moviesGrid.innerHTML = `<p style="color: #e50914; padding: 20px;">Տվյալների բեռնման սխալ: Խնդրում ենք ստուգել ինտերնետ կապը կամ կրկին փորձել:</p>`;
     }
 }
 
+// ==========================================
+// 4. DISPLAY MOVIES IN GRID
+// ==========================================
 function displayMovies(movies) {
     moviesGrid.innerHTML = "";
-    if (!movies || movies.length === 0) {
-        moviesGrid.innerHTML = "<p style='color: #94a3b8;'>No results found.</p>";
-        return;
-    }
 
-    movies.forEach(item => {
-        const title = item.title || item.name; // TV series uses 'name'
-        const releaseDate = item.release_date || item.first_air_date;
-        const year = releaseDate ? releaseDate.split("-")[0] : "N/A";
-        const poster = item.poster_path ? IMG_URL + item.poster_path : "https://via.placeholder.com/500x750?text=No+Image";
-        const isTv = !item.title; // Պարզում ենք սերիալ է, թե ֆիլմ
+    movies.forEach(movie => {
+        const movieCard = document.createElement("div");
+        movieCard.classList.add("movie-card");
 
-        const card = document.createElement("div");
-        card.className = "movie-card";
-        card.innerHTML = `
-            <img src="${poster}" alt="${title}">
+        const posterPath = movie.poster_path 
+            ? `${IMG_URL}${movie.poster_path}`
+            : "https://via.placeholder.com/500x750?text=No+Poster";
+
+        const title = movie.title || movie.name || "Untitled";
+        const isSaved = watchlist.some(m => m.id === movie.id);
+
+        movieCard.innerHTML = `
+            <img src="${posterPath}" alt="${title}" loading="lazy">
             <div class="movie-info">
-                <div class="movie-title">${title}</div>
-                <div class="movie-meta">
-                    <span>${year}</span>
-                    <span class="rating"><i class="fa-solid fa-star"></i> ${(item.vote_average || 0).toFixed(1)}</span>
+                <h3>${title}</h3>
+                <div class="card-buttons">
+                    <button class="watch-btn" onclick="watchMovie(${movie.id})">
+                        <i class="fa-solid fa-play"></i> Դիտել
+                    </button>
+                    <button class="add-to-watchlist-btn ${isSaved ? 'active' : ''}" onclick="toggleWatchlist(${movie.id}, this)">
+                        <i class="fa-solid ${isSaved ? 'fa-bookmark' : 'fa-bookmark'}"></i>
+                    </button>
                 </div>
-                <a href="movie.html?id=${item.id}&type=${isTv ? 'tv' : 'movie'}" class="watch-btn">
-                    <i class="fa-solid fa-play"></i> Watch ${isTv ? 'Series' : 'Movie'}
-                </a>
             </div>
         `;
-        moviesGrid.appendChild(card);
+
+        moviesGrid.appendChild(movieCard);
     });
 }
 
-// Category Tabs Click Handling
-categoryButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-        categoryButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+// ==========================================
+// 5. ACTIONS: WATCH & WATCHLIST
+// ==========================================
 
-        const type = btn.dataset.type;
-        const genre = btn.dataset.genre;
+// Ուղղորդում դեպի movie.html
+function watchMovie(movieId) {
+    window.location.href = `movie.html?id=${movieId}`;
+}
 
-        if (type === "trending") {
-            fetchMovies(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}`, "Trending Movies");
-        } else if (type === "popular") {
-            fetchMovies(`${BASE_URL}/movie/popular?api_key=${API_KEY}`, "Popular Movies");
-        } else if (type === "top_rated") {
-            fetchMovies(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}`, "Top Rated Movies");
-        } else if (type === "upcoming") {
-            fetchMovies(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}`, "Upcoming Movies");
-        } else if (type === "tv") {
-            fetchMovies(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}`, "Popular TV Series");
-        } else if (genre) {
-            const genreName = btn.innerText.trim();
-            fetchMovies(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genre}`, `${genreName} Movies`);
+// Watchlist-ի ավելացում/հեռացում LocalStorage-ում
+async function toggleWatchlist(movieId, btnElement) {
+    const index = watchlist.findIndex(m => m.id === movieId);
+
+    if (index !== -1) {
+        // Եթե արդեն կա, հեռացնում ենք
+        watchlist.splice(index, 1);
+        if (btnElement) btnElement.classList.remove("active");
+    } else {
+        // Եթե չկա, ավելացնում ենք
+        try {
+            const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}`);
+            const movieData = await res.json();
+            watchlist.push(movieData);
+            if (btnElement) btnElement.classList.add("active");
+        } catch (e) {
+            console.error("Error adding to watchlist:", e);
+        }
+    }
+
+    localStorage.setItem("watchlist", JSON.stringify(watchlist));
+}
+
+// Watchlist-ում գտնվող ֆիլմերի ցուցադրում
+function displayWatchlist() {
+    if (sectionTitle) sectionTitle.innerText = "My Watchlist";
+    watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+
+    if (watchlist.length === 0) {
+        moviesGrid.innerHTML = `<p style="color: #aaa; grid-column: 1/-1; padding: 20px;">Ձեր Watchlist-ը դատարկ է:</p>`;
+        return;
+    }
+
+    displayMovies(watchlist);
+}
+
+// ==========================================
+// 6. CATEGORIES & SEARCH
+// ==========================================
+
+// Կատեգորիաների կոճակների սեղմում
+categoryButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        categoryButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const category = button.dataset.category;
+
+        switch (category) {
+            case "trending":
+                fetchMovies(`/trending/movie/week?api_key=${API_KEY}`, "Trending Movies");
+                break;
+            case "popular":
+                fetchMovies(`/movie/popular?api_key=${API_KEY}`, "Popular Movies");
+                break;
+            case "top_rated":
+                fetchMovies(`/movie/top_rated?api_key=${API_KEY}`, "Top Rated Movies");
+                break;
+            case "upcoming":
+                fetchMovies(`/movie/upcoming?api_key=${API_KEY}`, "Upcoming Movies");
+                break;
+            case "action":
+                fetchMovies(`/discover/movie?api_key=${API_KEY}&with_genres=28`, "Action Movies");
+                break;
+            case "comedy":
+                fetchMovies(`/discover/movie?api_key=${API_KEY}&with_genres=35`, "Comedy Movies");
+                break;
+            default:
+                fetchMovies(`/trending/movie/week?api_key=${API_KEY}`, "Trending Movies");
         }
     });
 });
 
-// Search functionality
-searchForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const query = searchInput.value.trim();
-    if (!query) return;
+// Որոնում (Search)
+if (searchInput) {
+    searchInput.addEventListener("keyup", (e) => {
+        const query = e.target.value.trim();
+        if (query.length > 2) {
+            fetchMovies(`/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`, `Որոնման արդյունքներ: "${query}"`);
+        } else if (query.length === 0) {
+            fetchMovies(`/trending/movie/week?api_key=${API_KEY}`, "Trending Movies");
+        }
+    });
+}
 
-    categoryButtons.forEach(b => b.classList.remove("active"));
-    fetchMovies(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`, `Search Results for "${query}"`);
+// Watchlist Header Button
+if (watchlistNavBtn) {
+    watchlistNavBtn.addEventListener("click", () => {
+        categoryButtons.forEach(btn => btn.classList.remove("active"));
+        displayWatchlist();
+    });
+}
+
+// ==========================================
+// 7. MODALS (LOGIN / REGISTER)
+// ==========================================
+if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+        if (modalTitle) modalTitle.innerText = "Մուտք";
+        if (authModal) authModal.style.display = "flex";
+    });
+}
+
+if (registerBtn) {
+    registerBtn.addEventListener("click", () => {
+        if (modalTitle) modalTitle.innerText = "Գրանցվել";
+        if (authModal) authModal.style.display = "flex";
+    });
+}
+
+if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+        if (authModal) authModal.style.display = "none";
+    });
+}
+
+window.addEventListener("click", (e) => {
+    if (e.target === authModal) {
+        authModal.style.display = "none";
+    }
 });
 
-// Watchlist Button Click
-favoritesBtn.addEventListener("click", () => {
-    categoryButtons.forEach(b => b.classList.remove("active"));
-    sectionTitle.innerText = "My Watchlist";
-    displayMovies(watchlist);
+// ==========================================
+// 8. INITIAL LOAD
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    // Էջը բացելիս բեռնում է Trending Movies-ը
+    fetchMovies(`/trending/movie/week?api_key=${API_KEY}`, "Trending Movies");
 });
-
-// Initial Load
-fetchMovies(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}`, "Trending Movies");
